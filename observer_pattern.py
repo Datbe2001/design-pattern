@@ -63,3 +63,69 @@ product.add_observer(customer2)
 
 print(f'Initial price: {product.name} - {product.price}')
 product.price = 200
+
+# =================================================================================================================
+
+from abc import ABC, abstractmethod
+
+# Observer interface
+class Observer(ABC):
+    @abstractmethod
+    def update(self, temperature: float):
+        pass
+
+# ConcreteObserver
+class DisplayDevice(Observer):
+    def update(self, temperature: float):
+        print(f"Display Device: Updated temperature is {temperature}°C")
+
+class AlarmSystem(Observer):
+    def update(self, temperature: float):
+        if temperature > 30:
+            print("Alarm System: Warning! High temperature detected!")
+
+# Subject interface
+class Subject(ABC):
+    @abstractmethod
+    def register_observer(self, observer: Observer):
+        pass
+
+    @abstractmethod
+    def remove_observer(self, observer: Observer):
+        pass
+
+    @abstractmethod
+    def notify_observers(self):
+        pass
+
+# ConcreteSubject
+class TemperatureSensor(Subject):
+    def __init__(self):
+        self._observers = []
+        self._temperature = 0.0
+
+    def register_observer(self, observer: Observer):
+        self._observers.append(observer)
+
+    def remove_observer(self, observer: Observer):
+        self._observers.remove(observer)
+
+    def notify_observers(self):
+        for observer in self._observers:
+            observer.update(self._temperature)
+
+    def set_temperature(self, temperature: float):
+        print(f"TemperatureSensor: New temperature is {temperature}°C")
+        self._temperature = temperature
+        self.notify_observers()
+
+# Sử dụng Observer Pattern
+sensor = TemperatureSensor()
+display = DisplayDevice()
+alarm = AlarmSystem()
+
+sensor.register_observer(display)
+sensor.register_observer(alarm)
+
+sensor.set_temperature(10)  # Hiển thị nhiệt độ mới
+sensor.set_temperature(35)  # Cảnh báo nhiệt độ cao
